@@ -34,7 +34,7 @@
 
 ![alt text][id5]
 
-[id5]: /images/Step1-05.JPG "Generate script 선택"
+[id5]: /images/Step1-05.jpg "Generate script 선택"
 
 #### Step 1-6. Azure Arc 설치를 위한 Server의 사전 조건 (Prerequisite) 확인
 1) HTTPS 접속이 가능해야 함
@@ -43,25 +43,25 @@
 
 ![alt text][id6]
 
-[id6]: /images/Step1-06.JPG "사전조건 확인"
+[id6]: /images/Step1-06.jpg "사전조건 확인"
 
 #### Step 1-7. Resource Detail 입력
 
 ![alt text][id7]
 
-[id7]: /images/Step1-07.JPG "Resrouce Detail 입력"
+[id7]: /images/Step1-07.jpg "Resrouce Detail 입력"
 
 #### Step 1-8. Tags 입력
 
 ![alt text][id8]
 
-[id8]: /images/Step1-08.JPG "Tags 입력"
+[id8]: /images/Step1-08.jpg "Tags 입력"
 
 #### Step 1-9. 스크립트 다운로드
 
 ![alt text][id9]
 
-[id9]: /images/Step1-09.JPG "Script 다운로드"
+[id9]: /images/Step1-09.jpg "Script 다운로드"
 
 #### Step 1-10. Linux 혹은 Windows 서버에 다운드로 받은 스크립트 설치
 
@@ -73,7 +73,7 @@
 
 ![alt text][id11]
 
-[id11]: /images/Step1-11.JPG "스크립트 설치"
+[id11]: /images/Step1-11.jpg "스크립트 설치"
 
 
 **실습 순서**
