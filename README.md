@@ -8,9 +8,9 @@
 
 <!-- TOC -->
 
-- [Step 1. Deploy Azure Arc enabled server (서버 배포)](#deploy-azure-arc-enabled-server)
-- [Step 2. Azure Arc enabled server inventory (서버 목록 확인)](https://github.com/jeongaelee/AzureArc/tree/main/inventory-arc-enabled-servers.md)
-- [Step 3. Azure Arc enabled server monitoring (서버 모니터링)](https://github.com/jeongaelee/AzureArc/tree/main/monitor-arc-enabled-servers.md)
+- [Step 1. Deploy Azure Arc enabled server (서버 배포)](https://github.com/jeongaelee/AzureArc/blob/main/deploye-arc-enabled-servers.md)
+- [Step 2. Azure Arc enabled server inventory (서버 목록 확인)](https://github.com/jeongaelee/AzureArc/blob/main/inventory-arc-enabled-servers.md)
+- [Step 3. Azure Arc enabled server monitoring (서버 모니터링)](https://github.com/jeongaelee/AzureArc/blob/main/monitor-arc-enabled-servers.md)
 
 <!-- /TOC -->
 
