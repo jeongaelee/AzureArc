@@ -2,7 +2,7 @@
 
 ## Monitoring - Azure Arc enabled servers
 
-본 단계에서는 Azure Arc enabled 서버를 모니터링 하는 시나리오들에 대하여 실습 해 봅니다.
+본 단계에서는 Azure Arc enabled 서버를 모니터링 하는 시나리오에 대하여 실습 해 봅니다.
 
 ### Step 3. Azure Portal에서 Azure Arc enabled server 모니터링
 
@@ -10,13 +10,13 @@
 
 ![alt text][id1]
 
-[id1]: /images/Step3-01.JPG "Insights"
+[id1]: /images/Step3-01.jpg "Insights"
 
 #### Step 3-2. Azure Arc Insights Map 확인
 
 ![alt text][id2]
 
-[id2]: /images/Step3-02.JPG "Insights"
+[id2]: /images/Step3-02.jpg "Insights"
 
 #### Step 3-3. Azure Arc Insights Performance 확인
 
@@ -24,21 +24,21 @@
 
 ![alt text][id3]
 
-[id3]: /images/Step3-03.JPG "Insights"
+[id3]: /images/Step3-03.jpg "Insights"
 
 #### Step 3-4. Azure Portal 대쉬보드 확인
 
 ![alt text][id4]
 
-[id4]: /images/Step3-04.JPG "Insights"
+[id4]: /images/Step3-04.jpg "Insights"
 
 
 **실습 순서**
 
 <!-- TOC -->
 
-- [Step 1. Deploy Azure Arc enabled server (서버 배포)](#deploy-azure-arc-enabled-server)
-- [Step 2. Azure Arc enabled server inventory (서버 목록 확인)](https://github.com/jeongaelee/AzureArc/tree/main/inventory-arc-enabled-servers.md)
-- [Step 3. Azure Arc enabled server monitoring (서버 모니터링)](https://github.com/jeongaelee/AzureArc/tree/main/monitor-arc-enabled-servers.md)
+- [Step 1. Deploy Azure Arc enabled server (서버 배포)](https://github.com/jeongaelee/AzureArc/blob/main/deploy-arc-enabled-server.md)
+- [Step 2. Azure Arc enabled server inventory (서버 목록 확인)](https://github.com/jeongaelee/AzureArc/blob/main/inventory-arc-enabled-server.md)
+- [Step 3. Azure Arc enabled server monitoring (서버 모니터링)](https://github.com/jeongaelee/AzureArc/blob/main/monitor-arc-enabled-server.md)
 
 <!-- /TOC -->
