@@ -4,7 +4,7 @@
 
 본 단계에서는 Azure Arc enabled 서버를 모니터링 하는 시나리오들에 대하여 실습 해 봅니다.
 
-### Step 2. Azure Portal에서 Azure Arc enabled server 모니터링
+### Step 2. Azure Portal에서 Azure Arc enabled server 확인
 
 #### Step 2-1. Portal의 검색창에 Resource Graph Explorer 검색 후 메뉴로 이동
 
