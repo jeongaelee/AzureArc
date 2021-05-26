@@ -6,7 +6,7 @@
 
 본 Hands-on 워크샵에서는 Azure Arc enabled server의  온프레미스 및 클라우드 서버의 여러가지 관리 시나리오들에 대하여 실습해볼 수 있습니다.
 
-### 실습 아키텍처
+## 실습 아키텍처
 
 ![alt text][id2]
 
@@ -35,7 +35,7 @@
 
 <br>
 
-### 실습 준비 사항
+## 실습 준비 사항
 - Azure Subscription > Resource Provider > Microsoft.HybridCompute 등록
 
 ![alt text][id1]
