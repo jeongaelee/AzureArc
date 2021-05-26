@@ -68,7 +68,7 @@ Install-Module Az
 
 [id8]: /images/Step5-08.jpg "Azure Arc"
 
-## Azure Arc enabled SQL servers - SQL Assessment를 실행
+## Azure Arc enabled SQL servers - on-demand SQL Assessment를 실행
 
 ### Step 9. Log Analytics의 Workspace ID와 Primary Key를 복사
 
