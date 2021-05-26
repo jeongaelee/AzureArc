@@ -36,7 +36,7 @@ Install-Module Az
 
 ![alt text][id3]
 
-[id3]: /images/Step5-03.jpg "Azure Arc"
+[id3]: /images/Step5-03.JPG "Azure Arc"
 
 #### Step 4. Prerequisites 확인
 
