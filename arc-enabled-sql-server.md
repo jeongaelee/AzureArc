@@ -119,6 +119,12 @@ Install-Module Az
 
 [id16]: /images/Step5-16.JPG "Azure Arc"
 
+### Step 17. Assessment 결과 확인
+
+![alt text][id17]
+
+[id17]: /images/Step5-17.jpg "Azure Arc"
+
 <!-- TOC -->
 ## Azure Arc enabled servers
 
