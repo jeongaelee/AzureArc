@@ -32,13 +32,13 @@ Install-Module Az
 
 [id2]: /images/Step5-02.jpg "Azure Arc"
 
-#### Step 3. Project Details과 Server Details 입력
+#### Step 3. Prerequisites 확인
 
 ![alt text][id3]
 
 [id3]: /images/Step5-03.JPG "Azure Arc"
 
-#### Step 4. Prerequisites 확인
+#### Step 4. Project Details과 Server Details 입력
 
 ![alt text][id4]
 
