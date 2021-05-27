@@ -42,4 +42,4 @@
 
 [id1]: /images/hybrid.jpg "Architecture"
 
-- 본 [링크](https://github.com/microsoft/MCW-Line-of-business-application-migration/blob/master/Hands-on%20lab/Before%20the%20HOL%20-%20Line-of-business%20application%20migration.md") 의 Requirements와 Before the hands-on lab 과정을 모두 완료
+- 본 [링크](https://github.com/microsoft/MCW-Line-of-business-application-migration/blob/master/Hands-on%20lab/Before%20the%20HOL%20-%20Line-of-business%20application%20migration.md) 의 Requirements와 Before the hands-on lab 과정을 모두 완료
