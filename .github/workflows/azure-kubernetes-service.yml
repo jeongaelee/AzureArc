@@ -1,80 +1,170 @@
-# This workflow will build and push an application to a Azure Kubernetes Service (AKS) cluster when you push your code
-#
-# This workflow assumes you have already created the target AKS cluster and have created an Azure Container Registry (ACR)
-# For instructions see https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal
-# https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal
-# https://github.com/Azure/aks-create-action
-#
-# To configure this workflow:
-#
-# 1. Set the following secrets in your repository:
-#    - AZURE_CREDENTIALS (instructions for getting this https://github.com/Azure/login#configure-a-service-principal-with-a-secret)
-#
-# 2. Set the following environment variables (or replace the values below):
-#    - AZURE_CONTAINER_REGISTRY (name of your container registry)
-#    - PROJECT_NAME
-#    - RESOURCE_GROUP (where your cluster is deployed)
-#    - CLUSTER_NAME (name of your AKS cluster)
-#
-# 3. Choose the approrpiate render engine for the bake step https://github.com/Azure/k8s-bake. The config below assumes helm, then set
-#    any needed environment variables such as:
-#    - CHART_PATH 
-#    - CHART_OVERRIDE_PATH
-#
-# For more information on GitHub Actions for Azure, refer to https://github.com/Azure/Actions
-# For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples
-# For more options with the actions used below please see the folllowing
-# https://github.com/Azure/login
-# https://github.com/Azure/aks-set-context
-# https://github.com/marketplace/actions/azure-cli-action
-# https://github.com/Azure/k8s-bake
-# https://github.com/Azure/k8s-deploy   
+name: Build and Deploy to AKS
+on: push
 
-on: [push]
+env:
+  RESOURCEGROUPNAME: "skdevopsworkshop-rg"
+  LOCATION: "Korea Central"
+  SUBSCRIPTIONID: "bd350def-232b-423c-93bb-75472c4f4276"
+  IMAGENAME: "skdevopsworkshop"
+  REGISTRYSKU: "Standard"
+  REGISTRYNAME: "SKDevOpsWorkshopacr"
+  REGISTRYLOCATION: "South Central US"
+  CLUSTERNAME: "aks-devops-workshop"
+  APPINSIGHTSLOCATION: "Korea Central"
+  CLUSTERLOCATION: "Korea Central"
+
+  OMSLOCATION: "Korea Central"
+  OMSWORKSPACENAME: "aks-devops-workshop"
+  HTTPSAPPLICATIONROUTINGENABLED: false
+  KUBERNETESAPI: "apps/v1"
+  NAMESPACE: "stage" ## Cluster Namaspace
 
 jobs:
   build:
+    name: Build and Static analysis
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Restore Maven cache
+      uses: skjolber/maven-cache-github-action@v1
+      with:
+        step: restore    
+    - name: package
+      id: build-test
+      run: |
+          cd Application
+          ./mvnw -B verify
+    - name: Save Maven cache
+      uses: skjolber/maven-cache-github-action@v1
+      with:
+        step: save       
+
+    - name: Official SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v1.0.0
+      with:
+        # Additional arguments to the sonar-scanner
+        args: # optional
+        # Set the sonar.projectBaseDir analysis property
+        projectBaseDir: Application    
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_URL }}         
+                  
+  publish:
+    name: Publish to container registry
+    if: contains (github.ref, 'RC') || contains (github.ref, 'RELEASE')
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Restore Maven cache
+      uses: skjolber/maven-cache-github-action@v1
+      with:
+        step: restore      
+    - name: pacakge war
+      run: |
+          cd Application
+          ./mvnw -B package -Dmaven.test.skip=true
+    # login to azure
+    - name: Login to Azure
+      uses: azure/login@v1
+      with: 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Get ACR credentials
+      id: getACRCred
+      run: |
+           echo "::set-output name=acr_username::`az acr credential show -n ${{ env.REGISTRYNAME }} --query username | xargs`"
+           echo "::set-output name=acr_password::`az acr credential show -n ${{ env.REGISTRYNAME }} --query passwords[0].value | xargs`"
+           echo "::add-mask::`az acr credential show -n ${{ env.REGISTRYNAME }} --query passwords[0].value | xargs`"
     
-    - name: Azure Login
+    - name: Build and push image to ACR
+      id: build-image
+      run: |
+        echo "::add-mask::${{ steps.getACRCred.outputs.acr_password }}"
+        docker login ${{ env.REGISTRYNAME }}.azurecr.io --username ${{ steps.getACRCred.outputs.acr_username }} --password ${{ steps.getACRCred.outputs.acr_password }}
+        docker build "$GITHUB_WORKSPACE/Application" -f  "Application/Dockerfile" -t ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
+        docker push ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
+ 
+  deploy-stage:
+    name: Deploy application to stage AKS 
+    if: contains (github.ref, 'RC')
+    environment:
+      name: stage-environment
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    # login to azure
+    - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Build image on ACR
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.29.1
-        inlineScript: |
-          az configure --defaults acr=${{ env.AZURE_CONTAINER_REGISTRY }}
-          az acr build -t  -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PROJECT_NAME }}:${{ github.sha }}
-    
-    - name: Gets K8s context
-      uses: azure/aks-set-context@v1
-      with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          cluster-name: ${{ env.CLUSTER_NAME }}
-      id: login
 
-    - name: Configure deployment
-      uses: azure/k8s-bake@v1
+    - name: Get AKS Credentials
+      id: getContext
+      run: |
+          az aks get-credentials --resource-group ${{ env.RESOURCEGROUPNAME }} --name ${{ env.CLUSTERNAME }} --file $GITHUB_WORKSPACE/kubeconfig
+          echo "KUBECONFIG=$GITHUB_WORKSPACE/kubeconfig" >> $GITHUB_ENV
+    - name: Create namespace
+      run: |
+        namespacePresent=`kubectl get namespace | grep ${{ env.NAMESPACE }} | wc -l`
+        if [ $namespacePresent -eq 0 ]
+        then
+            echo `kubectl create namespace ${{ env.NAMESPACE }}`
+        fi
+    - name: Get ACR credentials
+      id: getACRCred
+      run: |
+           echo "::set-output name=acr_username::`az acr credential show -n ${{ env.REGISTRYNAME }} --query username | xargs`"
+           echo "::set-output name=acr_password::`az acr credential show -n ${{ env.REGISTRYNAME }} --query passwords[0].value | xargs`"
+           echo "::add-mask::`az acr credential show -n ${{ env.REGISTRYNAME }} --query passwords[0].value | xargs`"
+    - uses: azure/k8s-create-secret@v1
+      with:
+        namespace: ${{ env.NAMESPACE }}
+        container-registry-url: ${{ env.REGISTRYNAME }}.azurecr.io
+        container-registry-username: ${{ steps.getACRCred.outputs.acr_username }}
+        container-registry-password: ${{ steps.getACRCred.outputs.acr_password }}
+        secret-name: ${{ env.CLUSTERNAME }}dockerauth
+
+    - name: Fetch Application insights key
+      id: GetAppInsightsKey
+      run: |
+        echo "::set-output name=AIKey::`az resource show -g ${{ env.RESOURCEGROUPNAME }} -n ${{ env.CLUSTERNAME }} --resource-type "Microsoft.Insights/components" --query "properties.InstrumentationKey" -o tsv`"
+        echo "::add-mask::`az resource show -g ${{ env.RESOURCEGROUPNAME }} -n ${{ env.CLUSTERNAME }} --resource-type "Microsoft.Insights/components" --query "properties.InstrumentationKey" -o tsv`"
+    - uses: azure/k8s-bake@v1
+      id: bakeManifests
       with:
         renderEngine: 'helm'
-        helmChart: ${{ env.CHART_PATH }}
-        overrideFiles: ${{ env.CHART_OVERRIDE_PATH }}
-        overrides: |     
-          replicas:2
+        helmChart: './Application/charts/sampleapp' 
+        overrideFiles: './Application/charts/sampleapp/values.yaml'
+        overrides: |
+            image.repository:${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}
+            image.tag:${{ github.sha }}
+            imagePullSecrets:{${{ env.CLUSTERNAME }}dockerauth}
+            applicationInsights.InstrumentationKey:${{ steps.GetAppInsightsKey.outputs.AIKey }}
+            apiVersion:${{ env.KUBERNETESAPI }}
+            extensionApiVersion:${{ env.KUBERNETESAPI }}
         helm-version: 'latest' 
-      id: bake
+        silent: 'true'
 
-    - name: Deploys application
-    - uses: Azure/k8s-deploy@v1
+    - uses: azure/k8s-deploy@v1
       with:
-        manifests: ${{ steps.bake.outputs.manifestsBundle }}
+        namespace: ${{ env.NAMESPACE }}
+        manifests: ${{ steps.bakeManifests.outputs.manifestsBundle }}
         images: |
-          ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PROJECT_NAME }}:${{ github.sha }}
+          ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
         imagepullsecrets: |
-          ${{ env.PROJECT_NAME }}
+          ${{ env.CLUSTERNAME }}dockerauth
+    - name : Cleanup
+      run: | 
+        az logout
+        rm -rf $GITHUB_WORKSPACE/kubeconfig
